@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 import CardList from '../components/CardList';
 import SearchBox from '../components/SearchBox';
 import Scroll from '../components/Scroll';
@@ -6,7 +6,6 @@ import './App.css';
 
 function App () {
   const [robots, setRobots] = useState([]);
-  const [filteredRobots, setFilteredRobots] = useState([]);
   const [searchfield, setSearchfield] = useState('');
 
   useEffect(() => {
@@ -15,14 +14,12 @@ function App () {
       .then(users => setRobots(users));  
   }, []);
 
-  useEffect(() => {
-    const filteredRobots = robots.filter(robot => {
-      return robot.name.toLowerCase().includes(searchfield.toLowerCase());
-    });
-    setFilteredRobots(filteredRobots);
-  }, [searchfield, robots]);
-
   const onSearchChange = event => setSearchfield(event.target.value);
+
+  const filteredRobots = useMemo(
+    () => robots.filter(robot => robot.name.toLowerCase().includes(searchfield.toLowerCase())), 
+    [robots.length, searchfield]
+  );
 
   if (!robots.length) return <h1>Loading</h1>;
   return (
